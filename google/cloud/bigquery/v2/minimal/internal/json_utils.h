@@ -85,6 +85,18 @@ void SafeGetTo(nlohmann::json const& j, std::string const& key, R& (C::*f)(T) &,
     (obj.*f)(i->get<T>());
   }
 }
+
+template <typename T>
+void SafeGetTo(std::vector<std::shared_ptr<T>>& vec, nlohmann::json const& j, std::string const& key) {
+    auto it = j.find(key);
+    if (it != j.end() && it->is_array()) {
+        for (const auto& elem : *it) {
+            std::shared_ptr<T> value = std::make_shared<T>();
+            elem.get_to(*value); 
+            vec.push_back(value);
+        }
+    }
+}
 // NOLINTEND(misc-no-recursion)
 
 GOOGLE_CLOUD_CPP_INLINE_NAMESPACE_END
